@@ -13,7 +13,7 @@ gem "paperclip", "~> 3.5.4"
 gem "paperclip-dropbox", ">= 1.1.7"
 gem "figaro"
 gem "devise"
-
+gem "stripe"
 
 
 group :production do
