@@ -30,8 +30,22 @@ class ListingsController < ApplicationController
   # POST /listings
   # POST /listings.json
   def create
-        @listing = Listing.new(listing_params)
-        @listing.user_id = current_user.id
+    @listing = Listing.new(listing_params)
+    @listing.user_id = current_user.id
+
+        if current_user.recipient.blank?
+      Stripe.api_key = ENV["STRIPE_API_KEY"]
+      token = params[:stripeToken]
+
+      recipient = Stripe::Recipient.create(
+        :name => current_user.name,
+        :type => "individual",
+        :bank_account => token
+        )
+
+      current_user.recipient = recipient.id
+      current_user.save
+    end
 
 
     respond_to do |format|
@@ -45,19 +59,6 @@ class ListingsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /listings/1
-  # PATCH/PUT /listings/1.json
-  def update
-    respond_to do |format|
-      if @listing.update(listing_params)
-        format.html { redirect_to @listing, notice: 'Listing was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @listing.errors, status: :unprocessable_entity }
-      end
-    end
-  end
 
   # DELETE /listings/1
   # DELETE /listings/1.json
